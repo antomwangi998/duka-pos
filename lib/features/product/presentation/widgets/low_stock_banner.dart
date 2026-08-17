@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../bloc/product_bloc.dart';
+import '../bloc/product_bloc.dart';
 import '../../../shop/presentation/bloc/shop_bloc.dart';
 
 /// Shows a dismissable warning banner when any product stock falls

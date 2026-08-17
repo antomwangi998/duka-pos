@@ -5,9 +5,7 @@ import 'package:vibration/vibration.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../billing/presentation/bloc/billing_bloc.dart';
-import '../../../product/presentation/bloc/product_bloc.dart';
 import '../../../product/presentation/widgets/low_stock_banner.dart';
-import '../../../shop/presentation/bloc/shop_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../domain/entities/cart_item.dart';

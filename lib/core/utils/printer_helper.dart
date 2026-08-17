@@ -198,7 +198,6 @@ class PrinterHelper {
     // Should verify encoding, but Latin-1 usually works for basic printers
     return List.from(text.codeUnits);
   }
-}
 
   /// Kenya-specific receipt: KSh currency, VAT breakdown, M-Pesa ref, KRA PIN
   Future<void> printReceiptKenya({
@@ -311,3 +310,4 @@ class PrinterHelper {
 
     await PrintBluetoothThermal.writeBytes(bytes);
   }
+}
