@@ -1,30 +1,41 @@
-// This is a basic Flutter widget test.
+// Basic Flutter widget smoke test for Duka POS.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// NOTE: The original template test pumped MyApp() directly, but MyApp
+// depends on GetIt (BillingBloc, ProductBloc, ShopBloc, PrinterBloc) being
+// registered via `di.init()`, plus Hive being initialized — neither of
+// which happens outside of main(). It also asserted on counter-app text
+// ('0'/'1') left over from `flutter create`, which doesn't exist in this
+// app at all. That's why `flutter test` was failing in CI and blocking
+// the APK build step.
+//
+// This replaces it with a dependency-free smoke test so CI is unblocked.
+// TODO: add real bloc/widget tests once GetIt + Hive are mockable in a
+// test harness (e.g. via bloc_test / mockito, or a setUp() that calls
+// di.init() against an in-memory Hive box and fakes the camera/vibration
+// platform channels used by HomePage).
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:billing_app/main.dart';
+import 'package:billing_app/core/theme/app_theme.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('AppTheme renders a MaterialApp without dependency injection', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.lightTheme,
+        home: const Scaffold(body: Text('Duka POS')),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Duka POS'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  test('AppTheme.lightTheme builds a valid ThemeData', () {
+    final theme = AppTheme.lightTheme;
+    expect(theme, isA<ThemeData>());
+    expect(theme.primaryColor, AppTheme.primaryColor);
   });
 }
