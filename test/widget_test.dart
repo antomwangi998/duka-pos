@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dukaepos/core/theme/app_theme.dart';
-
 void main() {
   testWidgets('AppTheme renders a MaterialApp without dependency injection', (
     WidgetTester tester,
