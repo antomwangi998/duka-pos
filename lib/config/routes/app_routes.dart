@@ -13,6 +13,7 @@ import '../../features/customer/domain/entities/customer.dart';
 import '../../features/customer/presentation/pages/customers_list_page.dart';
 import '../../features/customer/presentation/pages/add_customer_page.dart';
 import '../../features/customer/presentation/pages/customer_detail_page.dart';
+import '../../features/expense/presentation/pages/expense_list_page.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -87,6 +88,10 @@ final router = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/expenses',
+      builder: (context, state) => const ExpenseListPage(),
     ),
   ],
 );

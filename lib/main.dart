@@ -10,6 +10,7 @@ import 'features/shop/presentation/bloc/shop_bloc.dart';
 import 'features/settings/presentation/bloc/printer_bloc.dart';
 import 'features/settings/presentation/bloc/printer_event.dart';
 import 'features/customer/presentation/bloc/customer_bloc.dart';
+import 'features/expense/presentation/bloc/expense_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,8 @@ class MyApp extends StatelessWidget {
             create: (context) => di.sl<PrinterBloc>()..add(InitPrinterEvent())),
         BlocProvider<CustomerBloc>(
             create: (context) => di.sl<CustomerBloc>()..add(LoadCustomers())),
+        BlocProvider<ExpenseBloc>(
+            create: (context) => di.sl<ExpenseBloc>()),
       ],
       child: MaterialApp.router(
         title: 'DukaEpos',

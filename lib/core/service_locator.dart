@@ -16,6 +16,10 @@ import '../../features/customer/data/repositories/customer_repository_impl.dart'
 import '../../features/customer/domain/repositories/customer_repository.dart';
 import '../../features/customer/domain/usecases/customer_usecases.dart';
 import '../../features/customer/presentation/bloc/customer_bloc.dart';
+import '../../features/expense/data/repositories/expense_repository_impl.dart';
+import '../../features/expense/domain/repositories/expense_repository.dart';
+import '../../features/expense/domain/usecases/expense_usecases.dart';
+import '../../features/expense/presentation/bloc/expense_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -106,5 +110,24 @@ Future<void> init() async {
   // Printer
   sl.registerLazySingleton<PrinterRepository>(
     () => PrinterRepositoryImpl(),
+  );
+
+  // ExpenseBloc
+  sl.registerFactory(
+    () => ExpenseBloc(
+      getExpensesUseCase: sl(),
+      addExpenseUseCase: sl(),
+      deleteExpenseUseCase: sl(),
+    ),
+  );
+
+  // Use cases - Expense
+  sl.registerLazySingleton(() => GetExpensesUseCase(sl()));
+  sl.registerLazySingleton(() => AddExpenseUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteExpenseUseCase(sl()));
+
+  // Repository - Expense
+  sl.registerLazySingleton<ExpenseRepository>(
+    () => ExpenseRepositoryImpl(),
   );
 }

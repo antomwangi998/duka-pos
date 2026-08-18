@@ -4,6 +4,7 @@ import '../../features/shop/data/models/shop_model.dart';
 import '../../features/sales/data/models/sale_record_model.dart';
 import '../../features/customer/data/models/customer_model.dart';
 import '../../features/customer/data/models/debt_transaction_model.dart';
+import '../../features/expense/data/models/expense_model.dart';
 
 class HiveDatabase {
   static const String productBoxName = 'products';
@@ -12,6 +13,7 @@ class HiveDatabase {
   static const String salesBoxName = 'sales';
   static const String customersBoxName = 'customers';
   static const String debtTransactionsBoxName = 'debt_transactions';
+  static const String expenseBoxName = 'expenses';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -23,6 +25,7 @@ class HiveDatabase {
     Hive.registerAdapter(SaleRecordModelAdapter());
     Hive.registerAdapter(CustomerModelAdapter());
     Hive.registerAdapter(DebtTransactionModelAdapter());
+    Hive.registerAdapter(ExpenseModelAdapter());
 
     // Open Boxes
     await Hive.openBox<ProductModel>(productBoxName);
@@ -31,6 +34,7 @@ class HiveDatabase {
     await Hive.openBox<SaleRecordModel>(salesBoxName);
     await Hive.openBox<CustomerModel>(customersBoxName);
     await Hive.openBox<DebtTransactionModel>(debtTransactionsBoxName);
+    await Hive.openBox<ExpenseModel>(expenseBoxName);
   }
 
   static Box<ProductModel> get productBox =>
@@ -43,4 +47,6 @@ class HiveDatabase {
       Hive.box<CustomerModel>(customersBoxName);
   static Box<DebtTransactionModel> get debtTransactionsBox =>
       Hive.box<DebtTransactionModel>(debtTransactionsBoxName);
+  static Box<ExpenseModel> get expenseBox =>
+      Hive.box<ExpenseModel>(expenseBoxName);
 }
