@@ -9,6 +9,10 @@ import '../../features/billing/presentation/pages/scanner_page.dart';
 import '../../features/billing/presentation/pages/checkout_page.dart';
 import '../../features/product/domain/entities/product.dart';
 import '../../features/sales/presentation/pages/sales_report_page.dart';
+import '../../features/customer/domain/entities/customer.dart';
+import '../../features/customer/presentation/pages/customers_list_page.dart';
+import '../../features/customer/presentation/pages/add_customer_page.dart';
+import '../../features/customer/presentation/pages/customer_detail_page.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -59,6 +63,30 @@ final router = GoRouter(
     GoRoute(
       path: '/reports',
       builder: (context, state) => const SalesReportPage(),
+    ),
+    GoRoute(
+      path: '/customers',
+      builder: (context, state) => const CustomersListPage(),
+      routes: [
+        GoRoute(
+          path: 'add',
+          builder: (context, state) {
+            final returnOnSave = state.extra == true;
+            return AddCustomerPage(returnOnSave: returnOnSave);
+          },
+        ),
+        GoRoute(
+          path: ':id',
+          builder: (context, state) {
+            final customer = state.extra as Customer?;
+            if (customer == null) {
+              // Deep link without extra data - fall back to the list.
+              return const CustomersListPage();
+            }
+            return CustomerDetailPage(customer: customer);
+          },
+        ),
+      ],
     ),
   ],
 );

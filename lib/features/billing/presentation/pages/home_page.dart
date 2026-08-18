@@ -8,6 +8,7 @@ import '../../../billing/presentation/bloc/billing_bloc.dart';
 import '../../../product/presentation/widgets/low_stock_banner.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/utils/scan_feedback_helper.dart';
 import '../../domain/entities/cart_item.dart';
 
 class HomePage extends StatefulWidget {
@@ -56,8 +57,11 @@ class _HomePageState extends State<HomePage> {
         // Vibrate
         final hasVibrator = await Vibration.hasVibrator();
         if (hasVibrator == true) {
-          Vibration.vibrate();
+          Vibration.vibrate(duration: 40);
         }
+
+        // Audible scan confirmation, alongside the haptic feedback above.
+        ScanFeedbackHelper().playSuccess();
 
         if (mounted) {
           context.read<BillingBloc>().add(ScanBarcodeEvent(rawValue));
@@ -75,6 +79,7 @@ class _HomePageState extends State<HomePage> {
             previous.error != current.error && current.error != null,
         listener: (context, state) {
           if (state.error != null) {
+            ScanFeedbackHelper().playError();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error!),
@@ -146,6 +151,15 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () async {
                     _scannerController.stop();
                     await context.push('/reports');
+                    if (_isCameraOn && mounted) _scannerController.start();
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildOverlayButton(
+                  icon: Icons.people_outline,
+                  onPressed: () async {
+                    _scannerController.stop();
+                    await context.push('/customers');
                     if (_isCameraOn && mounted) _scannerController.start();
                   },
                 ),

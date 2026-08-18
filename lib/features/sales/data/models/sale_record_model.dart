@@ -42,6 +42,10 @@ class SaleRecordModel extends HiveObject {
   final String paymentMethod; // 'cash' | 'mpesa' | 'credit'
   @HiveField(7)
   final String? mpesaRef;
+  @HiveField(8)
+  final String? customerId; // set when paymentMethod == 'credit'
+  @HiveField(9)
+  final String? customerName;
 
   SaleRecordModel({
     required this.id,
@@ -52,5 +56,7 @@ class SaleRecordModel extends HiveObject {
     required this.total,
     required this.paymentMethod,
     this.mpesaRef,
+    this.customerId,
+    this.customerName,
   });
 }

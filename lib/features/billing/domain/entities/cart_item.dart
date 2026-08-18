@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:billing_app/features/product/domain/entities/product.dart';
+import 'package:dukaepos/features/product/domain/entities/product.dart';
 
 class CartItem extends Equatable {
   final Product product;

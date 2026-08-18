@@ -1,0 +1,37 @@
+name: Generate App Icons
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-icons:
+    name: Run flutter_launcher_icons and commit result
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate app icons
+        run: dart run flutter_launcher_icons
+
+      - name: Commit generated icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/res ios/Runner/Assets.xcassets
+          if git diff --cached --quiet; then
+            echo "No icon changes to commit."
+          else
+            git commit -m "Regenerate app icons via flutter_launcher_icons"
+            git push
+          fi

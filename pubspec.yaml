@@ -1,4 +1,4 @@
-name: billing_app
+name: dukaepos
 description: A new Flutter project.
 publish_to: 'none'
 version: 1.0.0+1
@@ -43,6 +43,12 @@ dependencies:
   uuid: ^4.5.2
   app_settings: ^7.0.0
 
+  # Audio feedback for scans
+  audioplayers: ^6.0.0
+
+  # Tap-to-call on customer detail page
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -53,5 +59,18 @@ dev_dependencies:
   json_serializable: ^6.7.1
   hive_generator: ^2.0.1
 
+  # App icon generation - run `dart run flutter_launcher_icons`
+  flutter_launcher_icons: ^0.14.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#F2994A"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  min_sdk_android: 21
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/sounds/

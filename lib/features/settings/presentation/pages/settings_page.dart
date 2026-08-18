@@ -109,6 +109,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 _buildDivider(),
                 _buildListItem(
+                  icon: Icons.people_outline,
+                  title: 'Customers & Deni',
+                  subtitle: 'Track customers and credit sales',
+                  onTap: () => context.push('/customers'),
+                ),
+                _buildDivider(),
+                _buildListItem(
                   icon: Icons.storefront,
                   title: 'Shop Details',
                   subtitle: 'Edit business info & address',

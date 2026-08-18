@@ -49,6 +49,8 @@ class CheckoutEvent extends BillingEvent {
   final String paymentMethod; // 'cash' | 'mpesa' | 'credit'
   final String? mpesaRef;
   final bool printReceipt;
+  final String? customerId; // required when paymentMethod == 'credit'
+  final String? customerName;
 
   const CheckoutEvent({
     required this.shopName,
@@ -61,6 +63,8 @@ class CheckoutEvent extends BillingEvent {
     required this.paymentMethod,
     this.mpesaRef,
     this.printReceipt = true,
+    this.customerId,
+    this.customerName,
   });
 
   @override

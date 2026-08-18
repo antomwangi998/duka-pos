@@ -1,10 +1,12 @@
-import 'package:billing_app/core/widgets/primary_button.dart';
+import 'package:dukaepos/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../../shop/presentation/bloc/shop_bloc.dart';
+import '../../../customer/domain/entities/customer.dart';
+import '../../../customer/presentation/widgets/customer_picker_sheet.dart';
 import '../bloc/billing_bloc.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -17,6 +19,14 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   String _paymentMethod = 'cash'; // 'cash' | 'mpesa' | 'credit'
   final _mpesaRefController = TextEditingController();
+  Customer? _selectedCustomer;
+
+  Future<void> _pickCustomer() async {
+    final customer = await showCustomerPickerSheet(context);
+    if (customer != null && mounted) {
+      setState(() => _selectedCustomer = customer);
+    }
+  }
 
   @override
   void dispose() {
@@ -203,6 +213,49 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ],
                             ),
 
+                            // Credit (deni) section
+                            if (_paymentMethod == 'credit') ...[
+                              const SizedBox(height: 16),
+                              InkWell(
+                                onTap: _pickCustomer,
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: _selectedCustomer == null
+                                            ? Colors.red.shade200
+                                            : borderColor),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.person,
+                                          color: _selectedCustomer == null
+                                              ? Colors.red
+                                              : Theme.of(context)
+                                                  .primaryColor),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          _selectedCustomer?.name ??
+                                              'Select a customer for this deni',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: _selectedCustomer == null
+                                                  ? Colors.red
+                                                  : Colors.black87),
+                                        ),
+                                      ),
+                                      const Icon(Icons.chevron_right,
+                                          color: Colors.grey),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+
                             // M-Pesa section
                             if (_paymentMethod == 'mpesa') ...[
                               const SizedBox(height: 16),
@@ -266,7 +319,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                       child: PrimaryButton(
                         isLoading: billingState.isPrinting,
-                        onPressed: billingState.isPrinting
+                        onPressed: billingState.isPrinting ||
+                                (_paymentMethod == 'credit' &&
+                                    _selectedCustomer == null)
                             ? null
                             : () {
                                 context.read<BillingBloc>().add(CheckoutEvent(
@@ -282,9 +337,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ? null
                                           : _mpesaRefController.text.trim(),
                                       printReceipt: true,
+                                      customerId: _selectedCustomer?.id,
+                                      customerName: _selectedCustomer?.name,
                                     ));
                               },
-                        label: 'Complete Sale',
+                        label: _paymentMethod == 'credit' &&
+                                _selectedCustomer == null
+                            ? 'Select a Customer'
+                            : 'Complete Sale',
                         icon: Icons.check_circle,
                       ),
                     ),

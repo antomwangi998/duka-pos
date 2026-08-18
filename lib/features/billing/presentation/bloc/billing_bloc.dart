@@ -9,6 +9,8 @@ import '../../../../core/utils/printer_helper.dart';
 import '../../../../core/data/hive_database.dart';
 import '../../../sales/data/models/sale_record_model.dart';
 import '../../../sales/data/repositories/sale_repository_impl.dart';
+import '../../../customer/domain/entities/debt_transaction.dart';
+import '../../../customer/domain/repositories/customer_repository.dart';
 
 part 'billing_event.dart';
 part 'billing_state.dart';
@@ -18,12 +20,14 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
   final GetProductsUseCase getProductsUseCase;
   final UpdateProductUseCase updateProductUseCase;
   final SaleRepositoryImpl saleRepository;
+  final CustomerRepository customerRepository;
 
   BillingBloc({
     required this.getProductByBarcodeUseCase,
     required this.getProductsUseCase,
     required this.updateProductUseCase,
     required this.saleRepository,
+    required this.customerRepository,
   }) : super(const BillingState()) {
     on<ScanBarcodeEvent>(_onScanBarcode);
     on<AddProductToCartEvent>(_onAddProductToCart);
@@ -95,6 +99,16 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
       CheckoutEvent event, Emitter<BillingState> emit) async {
     emit(state.copyWith(isPrinting: true, clearError: true));
 
+    if (event.paymentMethod == 'credit' &&
+        (event.customerId == null || event.customerId!.isEmpty)) {
+      emit(state.copyWith(
+          isPrinting: false,
+          error: 'Please select a customer for credit sales',
+          clearError: false));
+      emit(state.copyWith(clearError: true));
+      return;
+    }
+
     try {
       // 1. Deduct stock for each cart item
       final box = HiveDatabase.productBox;
@@ -129,8 +143,9 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
               ))
           .toList();
 
+      final saleId = const Uuid().v4();
       final sale = SaleRecordModel(
-        id: const Uuid().v4(),
+        id: saleId,
         date: DateTime.now(),
         items: saleItems,
         subtotal: state.subtotal,
@@ -138,8 +153,23 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         total: state.totalAmount,
         paymentMethod: event.paymentMethod,
         mpesaRef: event.mpesaRef,
+        customerId: event.customerId,
+        customerName: event.customerName,
       );
       await saleRepository.saveSale(sale);
+
+      // 2b. Record the deni (credit) ledger entry against the customer.
+      if (event.paymentMethod == 'credit' && event.customerId != null) {
+        await customerRepository.addTransaction(DebtTransaction(
+          id: const Uuid().v4(),
+          customerId: event.customerId!,
+          type: DebtTransactionType.credit,
+          amount: state.totalAmount,
+          note: 'Credit sale',
+          date: DateTime.now(),
+          saleId: saleId,
+        ));
+      }
 
       // 3. Print receipt if requested
       if (event.printReceipt) {
